@@ -54,18 +54,43 @@ Every path produces an identical result.
 
 ```
 --stack <name>      flutter | ios | android | react-native
-                    Detected from project files when omitted.
---adapter <list>    claude, codex, copilot, opencode. Detected or prompted.
---from <dir>        Install from a local checkout instead of downloading.
+--adapter <list>    claude, codex, copilot, opencode (comma separated)
 --target <dir>      Project to install into. Defaults to the current directory.
+--from <dir>        Install from a local checkout instead of downloading.
 --dry-run           Print the plan and change nothing.
 --force             Overwrite existing Blueprint files without asking.
 --yes               Accept detected values without prompting.
 ```
 
-Detection reads `pubspec.yaml`, `package.json`, `*.xcodeproj`, and Gradle files.
-Cross-platform projects are matched before native ones, so a Flutter app with
-`ios/` and `android/` directories is not mistaken for a native Android project.
+Pass flags through the one-liner with `sh -s --`:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/rahatfci/mobile-ai-blueprint/main/install.sh \
+  | sh -s -- --stack flutter --adapter claude,codex
+```
+
+**Most of the time you need none of them.** Stack and AI tool are detected, and
+the target is wherever you are. Reach for a flag when:
+
+| Flag | When you need it |
+| --- | --- |
+| `--stack` | Detection failed, or you want a different pack than the obvious one. A React Native project where you intend to work mostly in the native iOS module is the common case: detection says `react-native`, you want `ios`. |
+| `--adapter` | You want more than one tool, or a tool that is not already set up. Detection only finds what is already there, so a fresh project has nothing to find. |
+| `--target` | You are not standing in the app. Monorepos are the main case: run it from the repo root with `--target apps/mobile`. |
+| `--from` | Air-gapped, or testing a local change to the installer. |
+| `--force` | Reinstalling or upgrading over an existing install, in a script. |
+
+Detection reads `pubspec.yaml`, `package.json`, `*.xcodeproj` or `Package.swift`,
+and Gradle files. Cross-platform projects are matched before native ones, so a
+Flutter or React Native app with `ios/` and `android/` directories is not
+mistaken for a native Android project.
+
+If the stack cannot be detected and the installer cannot ask, it **stops** and
+tells you to pass `--stack`. It never guesses: the wrong pack means wrong
+conventions, wrong commands, and wrong evidence rules.
+
+Adapters are additive. Installing `claude` today and `codex` next month leaves
+both trees in place.
 
 ## What gets installed
 

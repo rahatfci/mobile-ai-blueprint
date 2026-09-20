@@ -156,6 +156,12 @@ valid_adapter() {
   case "$1" in claude|codex|copilot|opencode) return 0 ;; *) return 1 ;; esac
 }
 
+# True only when a real person can answer. `curl | sh` still qualifies, because
+# the prompt reads /dev/tty rather than stdin; --yes and a CI runner do not.
+can_prompt() {
+  [ "$ASSUME_YES" -eq 0 ] && [ -r /dev/tty ]
+}
+
 # Prompts read from /dev/tty so they still work under `curl | sh`, where stdin
 # is the script itself rather than the terminal.
 ask() {
@@ -186,7 +192,14 @@ if [ -z "$STACK" ]; then
     ok "Detected stack: $(describe_stack "$STACK")"
   else
     warn "Could not detect a mobile stack in $TARGET"
-    STACK=$(ask "Stack (flutter/ios/android/react-native)" "flutter")
+    if can_prompt; then
+      STACK=$(ask "Stack (flutter/ios/android/react-native)" "flutter")
+    else
+      die "could not detect a mobile stack, and cannot prompt for one.
+  Pass the stack explicitly:  --stack flutter|ios|android|react-native
+  Detection looks for pubspec.yaml, package.json with react-native or expo,
+  an .xcodeproj or Package.swift, or Gradle files in $TARGET."
+    fi
   fi
 else
   info "Stack: $(describe_stack "$STACK") (specified)"
@@ -199,7 +212,12 @@ if [ -z "$ADAPTERS" ]; then
   if [ -n "$ADAPTERS" ]; then
     ok "Detected AI tools: $ADAPTERS"
   else
-    ADAPTERS=$(ask "AI tool adapters (claude,codex,copilot,opencode)" "claude")
+    if can_prompt; then
+      ADAPTERS=$(ask "AI tool adapters (claude,codex,copilot,opencode)" "claude")
+    else
+      ADAPTERS="claude"
+      info "No AI tool detected; defaulting to: claude (override with --adapter)"
+    fi
   fi
 else
   info "Adapters: $ADAPTERS (specified)"

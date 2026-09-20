@@ -86,6 +86,18 @@ chk "claude tree" "$(has "$WORK/rn/.claude/skills/device/SKILL.md")" "y"
 chk "agents tree" "$(has "$WORK/rn/.agents/skills/device/SKILL.md")" "y"
 
 echo
+echo "Undetectable stack is never guessed"
+mk blank
+rc=0; out=$(sh "$ROOT/install.sh" --target "$WORK/blank" --yes 2>&1) || rc=$?
+chk "refuses to install without a stack" "$rc" "1"
+chk "names the --stack flag" "$(printf '%s' "$out" | grep -c -- '--stack flutter')" "1"
+chk "wrote nothing" "$(has "$WORK/blank/AGENTS.md")" "n"
+rc=0; sh "$ROOT/install.sh" --target "$WORK/blank" --stack android --yes >/dev/null 2>&1 || rc=$?
+chk "installs once told the stack" "$rc" "0"
+chk "and it is the android pack" "$(grep -c 'gradlew' "$WORK/blank/AGENTS.md")" "$(grep -c 'gradlew' "$WORK/blank/AGENTS.md")"
+grep -q 'gradlew' "$WORK/blank/AGENTS.md" && chk "android commands present" y y || chk "android commands present" n y
+
+echo
 echo "Bad input is rejected"
 rc=0; sh "$ROOT/install.sh" --target "$WORK/flutter" --stack windows-phone --yes >/dev/null 2>&1 || rc=$?
 chk "bad stack" "$rc" "1"
