@@ -1,0 +1,44 @@
+name: Verify
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      # The installer is POSIX sh, so check it under dash rather than bash.
+      # bash accepts constructs dash rejects, and the install target is dash on
+      # many Linux runners and sh on macOS.
+      - name: Shell syntax
+        run: |
+          for f in install.sh scripts/*.sh; do
+            echo "checking $f"
+            dash -n "$f" || exit 1
+          done
+
+      - name: Transform syntax
+        run: python3 -m py_compile scripts/transform.py
+
+      - name: Install test suite
+        run: ./scripts/test-install.sh
+
+      # A mobile install that still points an agent at a browser is the failure
+      # this project exists to prevent, so it is a build break, not a lint note.
+      - name: No web references in shipped workflow
+        run: |
+          if grep -rniE 'next\.js|vercel|playwright|tailwind|prisma|clerk|localhost:3000|npm run dev' \
+              AGENTS.md CLAUDE.md blueprint .claude .agents stacks 2>/dev/null \
+              | grep -v '/blueprint/history'; then
+            echo "::error::web-specific references found in the shipped workflow"
+            exit 1
+          fi
+          echo "clean"
