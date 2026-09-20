@@ -1,0 +1,8 @@
+# Blueprint generated state
+blueprint/.state/
+
+# Release artifacts
+dist/
+
+# OS noise
+.DS_Store
