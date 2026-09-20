@@ -15,7 +15,10 @@
 set -eu
 
 VERSION="0.1.0"
-BASE_URL="${BLUEPRINT_BASE_URL:-https://github.com/rahatfci/mobile-ai-blueprint/releases/latest/download}"
+REPO="${BLUEPRINT_REPO:-rahatfci/mobile-ai-blueprint}"
+BRANCH="${BLUEPRINT_BRANCH:-main}"
+BASE_URL="${BLUEPRINT_BASE_URL:-https://github.com/$REPO/releases/latest/download}"
+ARCHIVE_URL="${BLUEPRINT_ARCHIVE_URL:-https://github.com/$REPO/archive/refs/heads/$BRANCH.tar.gz}"
 
 STACK=""
 ADAPTERS=""
@@ -227,17 +230,41 @@ resolve_source() {
     return
   fi
 
-  command -v curl >/dev/null 2>&1 || die "curl is required to download the release"
-  command -v tar  >/dev/null 2>&1 || die "tar is required to unpack the release"
+  command -v curl >/dev/null 2>&1 || die "curl is required to download"
+  command -v tar  >/dev/null 2>&1 || die "tar is required to unpack"
 
   TMPDIR_CREATED=$(mktemp -d 2>/dev/null || mktemp -d -t blueprint)
-  url="$BASE_URL/mobile-blueprint-$VERSION.tar.gz"
-  info "Downloading $url"
-  curl -fsSL "$url" -o "$TMPDIR_CREATED/release.tar.gz" ||
-    die "download failed. Use --from with a local checkout instead."
-  tar -xzf "$TMPDIR_CREATED/release.tar.gz" -C "$TMPDIR_CREATED" || die "could not unpack the release"
-  SOURCE="$TMPDIR_CREATED/mobile-blueprint-$VERSION"
-  [ -d "$SOURCE/stacks" ] || die "unexpected release layout under $SOURCE"
+
+  # A tagged release is preferred because its version is pinned, but the branch
+  # archive always exists for a public repository. Falling back to it means the
+  # one-line install works before any release has been cut.
+  fetched=0
+  for url in \
+    "$BASE_URL/mobile-blueprint-$VERSION.tar.gz" \
+    "$ARCHIVE_URL"
+  do
+    [ -n "$url" ] || continue
+    if curl -fsSL "$url" -o "$TMPDIR_CREATED/src.tar.gz" 2>/dev/null; then
+      info "Downloaded $url"
+      fetched=1
+      break
+    fi
+  done
+
+  [ "$fetched" -eq 1 ] || die "download failed. Check the network, or clone the repo and use --from."
+
+  tar -xzf "$TMPDIR_CREATED/src.tar.gz" -C "$TMPDIR_CREATED" || die "could not unpack the download"
+
+  # Release and branch archives unpack to differently named directories, so
+  # locate the root by its contents rather than by a guessed name.
+  SOURCE=""
+  for candidate in "$TMPDIR_CREATED"/*/; do
+    if [ -d "$candidate/stacks" ] && [ -f "$candidate/AGENTS.md" ]; then
+      SOURCE=$(cd "$candidate" && pwd)
+      break
+    fi
+  done
+  [ -n "$SOURCE" ] || die "unexpected archive layout: no directory with stacks/ and AGENTS.md"
 }
 
 resolve_source

@@ -15,37 +15,40 @@ Android Studio, `create-expo-app`), then overlay this on top.
 
 ## Install
 
-> **Status: pre-release.** Nothing is published yet, so install from a checkout.
-> The hosted one-liner below is what `scripts/build-release.sh` produces once a
-> release is cut.
+One line, from the root of your app:
 
 ```bash
-git clone https://github.com/rahatfci/mobile-ai-blueprint
-cd my-app
-../mobile-ai-blueprint/install.sh --dry-run   # see the plan, change nothing
-../mobile-ai-blueprint/install.sh             # install
+curl -fsSL https://raw.githubusercontent.com/rahatfci/mobile-ai-blueprint/main/install.sh | sh
 ```
 
-No Node required. `sh` and `tar` are enough from a checkout, plus `curl` when
-downloading a release. That covers every macOS machine, every Linux CI runner,
-and WSL.
+That is the whole install. No Node, no npm, no global tool. `sh`, `curl`, and
+`tar` are enough, which covers every macOS machine, every Linux CI runner, and
+WSL.
 
-Once a release is published:
+See what it would do first:
 
 ```bash
-curl -fsSL https://mobile-blueprint.dev/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/rahatfci/mobile-ai-blueprint/main/install.sh | sh -s -- --dry-run
 ```
 
 Reading a script before piping it to a shell is reasonable, and these docs are
 not going to pretend otherwise:
 
 ```bash
-curl -fsSL https://mobile-blueprint.dev/install.sh -o install.sh
+curl -fsSL https://raw.githubusercontent.com/rahatfci/mobile-ai-blueprint/main/install.sh -o install.sh
 less install.sh
 sh install.sh
 ```
 
-Both paths produce identical results.
+Or clone and run it, with nothing downloaded at install time:
+
+```bash
+git clone https://github.com/rahatfci/mobile-ai-blueprint
+cd my-app
+../mobile-ai-blueprint/install.sh
+```
+
+Every path produces an identical result.
 
 ### Options
 
