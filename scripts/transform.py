@@ -176,7 +176,7 @@ for root in [".claude/skills", ".agents/skills"]:
     ])
     edit(f"{root}/status/SKILL.md", [
         ("the shipped `For a standard Next.js project` command marker. When it does,",
-         "the shipped `Not set yet.` command marker. When it does,"),
+         "the shipped `<!-- blueprint:onboarding-required -->` marker. When it does,"),
     ])
     edit(f"{root}/adopt/SKILL.md", [
         ("project's *actual* conventions from Step 1, not the shipped Next.js/Prisma",
@@ -191,8 +191,15 @@ for root in [".claude/skills", ".agents/skills"]:
          "- manifest and build files (`pubspec.yaml`, `build.gradle`, `*.xcodeproj`, `package.json`, and"),
         ("- project name, from `package.json`, the folder name, existing docs, or the user",
          "- project name, from the manifest, the folder name, existing docs, or the user"),
-        ("a standard Next.js project` instruction when replacing the placeholder",
-         "Not set yet.` instruction when replacing the placeholder"),
+        ("""Remove the shipped `<!-- blueprint:onboarding-required -->` marker and the `For
+a standard Next.js project` instruction when replacing the placeholder
+commands. Status uses the dedicated marker, with the old sentence retained only
+as a migration fallback, to distinguish a fresh overlay from a tuned project.""",
+         """Remove the shipped `<!-- blueprint:onboarding-required -->` marker and the
+`For a standard <stack> project` line when replacing the stack pack's commands
+with the project's real ones. Status keys off the marker to tell a fresh
+install from a tuned project, so leaving it in place keeps `/status` reporting
+that onboarding is still pending."""),
         ("- whether `/check` should require browser evidence for UI work",
          "- whether `/check` should require device evidence for UI work"),
     ])
@@ -278,6 +285,16 @@ used, per `blueprint/context/platform.md`."""),
         ap.write_text(s)
 
 # ------------------------------------------- mobile skills replace web ones --
+# `disable-model-invocation` is a Claude Code frontmatter key. Upstream omits it
+# from the Codex tree, so the mobile skills follow the same convention rather
+# than shipping a Claude-only key where it means nothing.
+def strip_claude_only_frontmatter(path):
+    text = path.read_text()
+    lines = text.split("\n")
+    kept = [l for l in lines if l.strip() != "disable-model-invocation: true"]
+    if len(kept) != len(lines):
+        path.write_text("\n".join(kept))
+
 for root in [".claude/skills", ".agents/skills"]:
     if not (DEST / root).exists(): continue
     for skill_dir in sorted((MOBILE / "skills").iterdir()):
@@ -285,6 +302,9 @@ for root in [".claude/skills", ".agents/skills"]:
         target = DEST / root / skill_dir.name
         shutil.rmtree(target, ignore_errors=True)
         shutil.copytree(skill_dir, target)
+        if root == ".agents/skills":
+            for md in target.rglob("SKILL.md"):
+                strip_claude_only_frontmatter(md)
 
 # --------------------------------------------------------- stack packs -------
 shutil.copytree(MOBILE / "stacks", DEST / "stacks", dirs_exist_ok=True)

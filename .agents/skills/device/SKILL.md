@@ -1,7 +1,6 @@
 ---
 name: device
 description: List, boot, and drive simulators, emulators, and physical devices, install builds, and capture screenshot and log evidence. Use for /device, run on simulator, boot emulator, install the app, take a screenshot, or capture logs.
-disable-model-invocation: true
 ---
 
 # device - run the app somewhere you can see it

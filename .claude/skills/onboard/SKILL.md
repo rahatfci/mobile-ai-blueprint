@@ -129,10 +129,11 @@ If the root `README.md` already looks like a real project README, leave it alone
 Never replace a project README with Blueprint documentation.
 
 Update the Commands section of `AGENTS.md` to match real scripts and commands.
-Remove the shipped `<!-- blueprint:onboarding-required -->` marker and the `For
-Not set yet.` instruction when replacing the placeholder
-commands. Status uses the dedicated marker, with the old sentence retained only
-as a migration fallback, to distinguish a fresh overlay from a tuned project.
+Remove the shipped `<!-- blueprint:onboarding-required -->` marker and the
+`For a standard <stack> project` line when replacing the stack pack's commands
+with the project's real ones. Status keys off the marker to tell a fresh
+install from a tuned project, so leaving it in place keeps `/status` reporting
+that onboarding is still pending.
 Include only commands that exist or are intentionally available:
 
 - dev server

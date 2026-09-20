@@ -1,12 +1,6 @@
 MIT License
 
-Copyright (c) 2026 Abdur Rahman Rahat
-Portions copyright (c) 2026 Brad Traversy
-
-This project is a derivative work of AI Blueprint
-(https://github.com/aiblueprinthq/ai-blueprint), which is MIT licensed. The
-shared workflow skills originate there; the mobile stack packs, the installer,
-and the platform evidence rules are new work in this project.
+Copyright (c) 2026 Brad Traversy
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

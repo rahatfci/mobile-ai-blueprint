@@ -45,7 +45,7 @@ state.
    the current adapter supports it. Audit, check, and try guide default to
    `manual`.
    Before recommending `/overview`, check whether `AGENTS.md` still contains
-   the shipped `Not set yet.` command marker. When it does,
+   the shipped `<!-- blueprint:onboarding-required -->` marker. When it does,
    onboarding is incomplete and `/onboard` is the next action.
 2. **Build plan** - `blueprint/build-plan.md`. Count checked vs unchecked leaf
    items. Name the next unchecked leaf, the same target `/feature` would pick,

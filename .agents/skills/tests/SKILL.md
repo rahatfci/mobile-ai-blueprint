@@ -1,7 +1,6 @@
 ---
 name: tests
 description: Set up unit, widget, and component testing with /tests, or device-level UI and end-to-end testing with /tests e2e. Reuse or configure the stack-native runner, add one example test, document commands, and verify. Use check for one-time live verification.
-disable-model-invocation: true
 ---
 
 # tests - set up mobile testing

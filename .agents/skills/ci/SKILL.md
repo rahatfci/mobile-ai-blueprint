@@ -1,7 +1,6 @@
 ---
 name: ci
 description: Set up or normalize one project Verify command and matching automatic checks for a mobile app, handling macOS runners, SDK caching, and signing boundaries, with an optional local pre-push hook. Use for /ci, GitHub Actions for mobile, pull-request checks, or build caching.
-disable-model-invocation: true
 ---
 
 # ci - automatic checks for a mobile project

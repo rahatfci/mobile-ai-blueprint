@@ -1,7 +1,6 @@
 ---
 name: prototype
 description: Build throwaway native screens to lock layout, navigation, and design tokens before feature implementation. Use for /prototype, screen mockups, look and feel, design tokens, or deciding navigation structure.
-disable-model-invocation: true
 ---
 
 # prototype - lock the look before you build

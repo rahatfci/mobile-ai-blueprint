@@ -1,7 +1,6 @@
 ---
 name: release
 description: Prepare App Store, TestFlight, Google Play, and internal distribution readiness by checking versioning, signing, permissions, store metadata, and release builds without uploading. Use for /release, ship to TestFlight, Play Console setup, store submission, or build number checks.
-disable-model-invocation: true
 ---
 
 # release - store readiness, not a submit button

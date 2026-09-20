@@ -1,7 +1,6 @@
 ---
 name: check
 description: Prove the current spec against the app running on a real simulator, emulator, or device, per platform, or use check guide for a read-only manual test guide. Use for /check, verify the feature, does it work on Android, or acceptance before complete.
-disable-model-invocation: true
 ---
 
 # check - prove it on a device
